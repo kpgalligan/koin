@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.gradle.api.publish.maven.internal.artifact.FileBasedMavenArtifact
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
@@ -55,6 +56,16 @@ if (hasProperty('bintray_user') && hasProperty('bintray_apikey')) {
   }
 
   bintrayUpload.doFirst {
+    publishing.publications.withType(MavenPublication).forEach({ publication ->
+      File moduleFile = new File(project.buildDir, "publications/${publication.name}/module.json")
+      if (moduleFile.exists()) {
+        publication.artifact(new FileBasedMavenArtifact(moduleFile) {
+          protected String getDefaultExtension() {
+            return 'module';
+          }
+        })
+      }
+    })
     publications = project.publishing.publications
   }
 }

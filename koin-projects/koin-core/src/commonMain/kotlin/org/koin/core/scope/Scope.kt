@@ -162,7 +162,7 @@ data class Scope(
             parameters: ParametersDefinition? = null
     ): T? {
         return try {
-            get(clazz, qualifier, parameters)
+            get<T>(clazz, qualifier, parameters)
         } catch (e: Exception) {
             _koin._logger.error("Can't get instance for ${clazz.getFullName()}")
             null
@@ -191,7 +191,7 @@ data class Scope(
             _koin._logger.debug("|- '${clazz.getFullName()}' in $duration ms")
             return instance
         } else {
-            resolveInstance(qualifier, clazz, parameters)
+            resolveInstance<T>(qualifier, clazz, parameters)
         }
     }
 
@@ -205,8 +205,8 @@ data class Scope(
         }
         //TODO Resolve in Root or link
         val indexKey = indexKey(clazz, qualifier)
-        return _instanceRegistry.resolveInstance(indexKey, parameters)
-                ?: findInOtherScope<T>(clazz, qualifier, parameters) ?: getFromSource(clazz)
+        return _instanceRegistry.resolveInstance<T>(indexKey, parameters)
+                ?: findInOtherScope<T>(clazz, qualifier, parameters) ?: getFromSource<T>(clazz)
                 ?: throwDefinitionNotFound(qualifier, clazz)
     }
 
